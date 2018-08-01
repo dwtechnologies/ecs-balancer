@@ -63,7 +63,7 @@ aws cloudformation deploy \
 
 ------
 
-**Note**: according to AWS documentation[^ecs_cwe_events], this CW event covers a lot of scenarios.
+**Note**: according to [AWS documentation](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs_cwe_events.html), this CW event covers a lot of scenarios.
 
 To avoid too many invokes, CW event pattern is restricted to a specific ECS cluster:
 
@@ -75,9 +75,4 @@ Pattern:
     clusterArn: 
       - !Sub "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${clusterName}"
 ```
-
-
-
-[^ecs_cwe_events]: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs_cwe_events.html
-
 

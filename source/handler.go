@@ -66,7 +66,6 @@ func Handler(event events.CloudWatchEvent) error {
 		*r.ContainerInstances[0].RunningTasksCount == 0 &&
 		*r.ContainerInstances[0].PendingTasksCount == 0 &&
 		*r.ContainerInstances[0].AgentConnected {
-		log.Printf("rebalancing cluster tasks")
 
 		err := balanceCluster(client, eventDetail.ClusterArn)
 		if err != nil {
@@ -103,10 +102,8 @@ func balanceCluster(client *ecs.ECS, cluster string) error {
 	}).Send()
 
 	for _, s := range rr.Services {
-		log.Printf("%s %d", *s.ServiceName, *s.DesiredCount)
-
 		if *s.DesiredCount > 1 {
-			log.Printf("rebalancing service %s", *s.ServiceName)
+			log.Printf("balancing service: %s (%d instances)", *s.ServiceName, *s.DesiredCount)
 
 			// force new deployment
 			_, err := client.UpdateServiceRequest(&ecs.UpdateServiceInput{

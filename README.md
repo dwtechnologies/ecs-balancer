@@ -1,4 +1,5 @@
 # ecs-balancer
+
 When a new ECS instance register in a cluster it's empty. ECS doesn't have a way to reschedule tasks in order to fill the new capacity or spread the worload among AZs.
 
 This Lambda function is triggered by "Container Instance State Change Events" CloudWatch event and:
@@ -9,19 +10,74 @@ This Lambda function is triggered by "Container Instance State Change Events" Cl
 
 
 
+##### CloudWatchEvent
+
+```json
+{
+  "version": "0",
+  "id": "8952ba83-7be2-4ab5-9c32-6687532d15a2",
+  "detail-type": "ECS Container Instance State Change",
+  "source": "aws.ecs",
+  "account": "111122223333",
+  "time": "2016-12-06T16:41:06Z",
+  "region": "eu-west-1",
+  "resources": [
+    "arn:aws:ecs:eu-west-1:111122223333:container-instance/b54a2a04-046f-4331-9d74-3f6d7f6ca315"
+  ],
+  "detail": {
+    "agentConnected": true,
+    "attributes": [],
+    "clusterArn": "arn:aws:ecs:eu-west-1:111122223333:cluster/default",
+    "containerInstanceArn": "arn:aws:ecs:eu-west-1:111122223333:container-instance/803b97fd-1da1-4e31-8080-6b5b8f34123e",
+    "ec2InstanceId": " i-00043580a9a035076"
+  }
+}
+```
+
+
+
+##### Build and package
+
+```sh
+cd source; GOOS=linux go build -o main handler.go && zip deployment.zip main
+aws cloudformation package \
+	--template-file sam.yaml \
+	--output-template-file output_sam.yaml \
+	--s3-bucket <some-bucket>
+```
+
+
+
+##### Deploy
+
+```sh
+aws cloudformation deploy \
+	--template-file output_sam.yaml \
+	--capabilities CAPABILITY_IAM \
+	--stack-name <some-name> \
+	--parameter-overrides \
+		clusterName=<some-cluster> \
+	--no-fail-on-empty-changeset
+```
+
+
 ------
 
 **Note**: according to AWS documentation[^ecs_cwe_events], this CW event covers a lot of scenarios.
 
 To avoid too many invokes, CW event pattern is restricted to a specific ECS cluster:
 
-```
+```yaml
 Pattern:
   source: ["aws.ec2"]
   detail-type: ["EC2 Spot Instance Interruption Warning"]
+  detail:
+    clusterArn: 
+      - !Sub "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${clusterName}"
 ```
 
 
 
 [^ecs_cwe_events]: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs_cwe_events.html
+
 

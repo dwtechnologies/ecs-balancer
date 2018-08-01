@@ -9,6 +9,19 @@ This Lambda function is triggered by "Container Instance State Change Events" Cl
 - if both values are 0 and ECS agent is connected, trigger a cluster balance by upating all the services with 'DesiredCount > 1'
 
 
+##### Service resource (placement strategies)
+```yaml
+  Service:
+    Type: "AWS::ECS::Service"
+    Properties:
+	...
+      PlacementStrategies:
+        - Type: spread
+          Field: attribute:ecs.availability-zone
+        - Type: spread
+          Field: instanceId
+	...
+```
 
 ##### CloudWatchEvent
 

@@ -1,6 +1,6 @@
 # ecs-balancer
 
-When a new ECS instance register in a cluster it's empty. ECS doesn't have a way to reschedule tasks in order to fill the new capacity or spread the worload among AZs.
+When a new ECS instance registers in a cluster, ECS doesn't have a way to reschedule tasks in order to fill the new capacity or spread the worload among AZs.
 
 This Lambda function is triggered by "Container Instance State Change Events" CloudWatch event and:
 

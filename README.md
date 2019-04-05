@@ -9,7 +9,7 @@ This Lambda function is triggered by "Container Instance State Change Events" Cl
 ### Service resource (placement strategies)
 ```yaml
   Service:
-    Type: "AWS::ECS::Service"
+    Type: AWS::ECS::Service
     Properties:
       PlacementStrategies:
         - Type: spread

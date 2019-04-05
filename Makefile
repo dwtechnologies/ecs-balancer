@@ -40,7 +40,7 @@ deploy-cf:
 		--template-file build/sam.yaml \
 		--stack-name ecs-balancer-$(ECS_CLUSTER) \
 		--parameter-overrides \
-			clusterName=$(CLUSTER_NAME) \
+			ecsCluster=$(ECS_CLUSTER) \
 		--tags \
                         Environment=$(ENVIRONMENT) \
                         Project=$(PROJECT) \

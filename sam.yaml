@@ -2,7 +2,7 @@ Transform: AWS::Serverless-2016-10-31
 Description: ECS Balancer
 
 Parameters:
-  clusterName:
+  ecsCluster:
     Type: String
 
 
@@ -10,7 +10,7 @@ Resources:
   ecsBalancer:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub ecs-balancer-${clusterName}
+      FunctionName: !Sub ecs-balancer-${ecsCluster}
       Description: "success is balance"
       Handler: main
       Runtime: go1.x
@@ -34,6 +34,6 @@ Resources:
               detail-type: ["ECS Container Instance State Change"]
               detail:
                 clusterArn:
-                  - !Sub "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${clusterName}"
+                  - !Sub "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${ecsCluster}"
 
 # eof

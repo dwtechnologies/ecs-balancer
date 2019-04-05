@@ -6,6 +6,7 @@ PROJECT      ?= itops
 OWNER        ?= cloudops
 SERVICE_NAME ?= ecs-balancer
 S3_BUCKET    ?=
+ECS_CLUSTER  ?= default
 
 ###
 
@@ -37,8 +38,10 @@ package-cf:
 deploy-cf:
 	aws cloudformation deploy \
 		--template-file build/sam.yaml \
-                --stack-name ec2scheduler \
-                --tags \
+		--stack-name ecs-balancer-$(ECS_CLUSTER) \
+		--parameter-overrides \
+			clusterName=$(CLUSTER_NAME) \
+		--tags \
                         Environment=$(ENVIRONMENT) \
                         Project=$(PROJECT) \
                         Owner=$(OWNER) \

@@ -1,4 +1,4 @@
-# ecs-balancer
+# ⚖️  ecs-balancer
 
 When a new ECS instance registers in a cluster, ECS doesn't have a way to reschedule tasks in order to fill the new capacity or spread the worload among AZs.
 

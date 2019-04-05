@@ -18,10 +18,10 @@ type cloudwatchEventDetail struct {
 }
 
 func main() {
-	lambda.Start(Handler)
+	lambda.Start(handler)
 }
 
-func Handler(event events.CloudWatchEvent) error {
+func handler(event events.CloudWatchEvent) error {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	eventDetail := &cloudwatchEventDetail{}
 

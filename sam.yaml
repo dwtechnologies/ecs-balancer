@@ -7,56 +7,33 @@ Parameters:
 
 
 Resources:
-  ecsBalancerRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          -
-            Effect: Allow
-            Principal:
-              Service:
-                - "lambda.amazonaws.com"
-            Action:
-              - "sts:AssumeRole"
-      Path: "/"
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-      Policies:
-        - PolicyName: "LambdaRole"
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              -
-                Effect: "Allow"
-                Action:
-                  - "ecs:DescribeContainerInstances"
-                  - "ecs:ListServices"
-                  - "ecs:DescribeServices"
-                  - "ecs:UpdateService"
-                Resource: "*"
-
-
   ecsBalancer:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: !Sub ecs-balancer-${clusterName}
-      Description: "Success is balance"
+      Description: "success is balance"
       Handler: main
-      Role: !GetAtt ecsBalancerRole.Arn
       Runtime: go1.x
-      Timeout: 10
-      CodeUri: ./source/deployment.zip
+      Timeout: 20
+      Policies:
+        - Statement:
+          - Effect: "Allow"
+            Action:
+              - "ecs:DescribeContainerInstances"
+              - "ecs:DescribeServices"
+              - "ecs:ListServices"
+              - "ecs:UpdateService"
+            Resource: "*"
+      CodeUri: ./source/handler.zip
       Events:
-        SpotWarningForSpoptimize:
+        SpotWarning:
           Type: CloudWatchEvent
           Properties:
             Pattern:
               source: ["aws.ecs"]
               detail-type: ["ECS Container Instance State Change"]
               detail:
-                clusterArn: 
+                clusterArn:
                   - !Sub "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${clusterName}"
 
 # eof

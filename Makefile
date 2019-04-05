@@ -25,7 +25,7 @@ build:
 			echo "▸ build done..."'
 
 build-native:
-	cd source; GOOS=linux go build -o main && zip handler.zip main
+	cd source; GOOS=linux go test -v -cover && go build -o main && zip handler.zip main
 
 package-cf:
 	mkdir -p build

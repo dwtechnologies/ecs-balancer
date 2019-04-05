@@ -48,18 +48,6 @@ deploy-cf:
                 --capabilities CAPABILITY_IAM
 	rm -rf build source/main source/handler.zip
 
-deploy-cf:
-	aws cloudformation deploy --template-file build/sam.yaml \
-		--capabilities CAPABILITY_IAM \
-		--stack-name $(PROJECT)-$(SERVICE_NAME) \
-		--profile $(AWS_PROFILE) \
-		--region $(AWS_DEFAULT_REGION) \
-		--parameter-overrides clusterName=fishnchips-spot \
-		--tags \
-			Project=$(PROJECT) \
-		--no-fail-on-empty-changeset
-	rm -f source/main source/deployment.zip
-
 clean:
 	rm -rf build source/main source/handler.zip
 

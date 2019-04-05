@@ -6,6 +6,7 @@ This Lambda function is triggered by "Container Instance State Change Events" Cl
 - check nr of running and pending tasks for ContainerInstanceArn
 - if both values are 0 and ECS agent is connected, trigger a cluster balance by upating all the services with 'DesiredCount > 1'
 
+
 ### Service resource (placement strategies)
 ```yaml
   Service:
@@ -18,8 +19,8 @@ This Lambda function is triggered by "Container Instance State Change Events" Cl
           Field: instanceId
 ```
 
-### CloudWatchEvent
 
+### CloudWatch event
 ```json
 {
   "version": "0",

@@ -26,7 +26,7 @@ Resources:
             Resource: "*"
       CodeUri: ./source/handler.zip
       Events:
-        SpotWarning:
+        InstanceStateChange:
           Type: CloudWatchEvent
           Properties:
             Pattern:

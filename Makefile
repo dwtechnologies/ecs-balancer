@@ -16,7 +16,7 @@ build:
 	@docker run --rm \
 		-v $(PWD)/source:/src \
 		-w /src \
-		golang:1.12.0-stretch sh -c \
+		golang:stretch sh -c \
 			'apt-get update && apt-get install -y zip && \
 			echo "\n▸ building code..." && \
 			cd /src/ && go test -v -cover && go build -o main && \

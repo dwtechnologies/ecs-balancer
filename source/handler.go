@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 
@@ -21,7 +22,7 @@ func main() {
 	lambda.Start(handler)
 }
 
-func handler(event events.CloudWatchEvent) error {
+func handler(ctx context.Context, event events.CloudWatchEvent) error {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	eventDetail := &cloudwatchEventDetail{}
 
@@ -41,7 +42,7 @@ func handler(event events.CloudWatchEvent) error {
 	r, err := client.DescribeContainerInstancesRequest(&ecs.DescribeContainerInstancesInput{
 		Cluster:            aws.String(eventDetail.ClusterArn),
 		ContainerInstances: []string{eventDetail.ContainerInstanceArn},
-	}).Send()
+	}).Send(ctx)
 	if err != nil {
 		return err
 	}
@@ -67,7 +68,7 @@ func handler(event events.CloudWatchEvent) error {
 		*r.ContainerInstances[0].PendingTasksCount == 0 &&
 		*r.ContainerInstances[0].AgentConnected {
 
-		err := balanceCluster(client, eventDetail.ClusterArn)
+		err := balanceCluster(ctx, client, eventDetail.ClusterArn)
 		if err != nil {
 			return err
 		}
@@ -76,7 +77,7 @@ func handler(event events.CloudWatchEvent) error {
 	return nil
 }
 
-func newECSClient() (*ecs.ECS, error) {
+func newECSClient() (*ecs.Client, error) {
 	cfg, err := external.LoadDefaultAWSConfig()
 	if err != nil {
 		return nil, err
@@ -85,12 +86,12 @@ func newECSClient() (*ecs.ECS, error) {
 	return ecs.New(cfg), err
 }
 
-func balanceCluster(client *ecs.ECS, cluster string) error {
+func balanceCluster(ctx context.Context, client *ecs.Client, cluster string) error {
 	// list services
 	r, err := client.ListServicesRequest(&ecs.ListServicesInput{
 		Cluster:    aws.String(cluster),
 		LaunchType: ecs.LaunchTypeEc2,
-	}).Send()
+	}).Send(ctx)
 	if err != nil {
 		return err
 	}
@@ -99,7 +100,7 @@ func balanceCluster(client *ecs.ECS, cluster string) error {
 	rr, err := client.DescribeServicesRequest(&ecs.DescribeServicesInput{
 		Cluster:  aws.String(cluster),
 		Services: r.ServiceArns,
-	}).Send()
+	}).Send(ctx)
 
 	for _, s := range rr.Services {
 		if *s.DesiredCount > 1 {
@@ -110,7 +111,7 @@ func balanceCluster(client *ecs.ECS, cluster string) error {
 				Cluster:            aws.String(cluster),
 				Service:            s.ServiceName,
 				ForceNewDeployment: aws.Bool(true),
-			}).Send()
+			}).Send(ctx)
 			if err != nil {
 				return err
 			}

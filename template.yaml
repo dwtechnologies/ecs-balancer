@@ -1,0 +1,39 @@
+Transform: AWS::Serverless-2016-10-31
+Description: ECS Balancer
+
+Parameters:
+  ecsCluster:
+    Type: String
+
+
+Resources:
+  ecsBalancer:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ecs-balancer-${ecsCluster}
+      Description: "ecs-balancer - success is balance"
+      Handler: main
+      Runtime: go1.x
+      Timeout: 20
+      Policies:
+        - Statement:
+          - Effect: "Allow"
+            Action:
+              - "ecs:DescribeContainerInstances"
+              - "ecs:DescribeServices"
+              - "ecs:ListServices"
+              - "ecs:UpdateService"
+            Resource: "*"
+      CodeUri: ./source/handler.zip
+      Events:
+        InstanceStateChange:
+          Type: CloudWatchEvent
+          Properties:
+            Pattern:
+              source: ["aws.ecs"]
+              detail-type: ["ECS Container Instance State Change"]
+              detail:
+                clusterArn:
+                  - !Sub "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${ecsCluster}"
+
+# eof
